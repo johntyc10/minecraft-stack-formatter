@@ -24,22 +24,22 @@ def item_count_to_string(item_name: str, count: int) -> str:
 
     if count < 0:
         raise ValueError("count cannot be less than 0!")
-    
+
     if count <= STACK_SIZE:
         return f"{count} {item_name}"
 
     if STACK_SIZE <= count < SHULKER_BOX_SIZE:
         stack_count = count // STACK_SIZE
         remainder_count = count % STACK_SIZE
-        return f"{count} ({stack_count} {add_s("stack", stack_count)} + {remainder_count}) {item_name}"
+        return f"{count} ({stack_count}s + {remainder_count}) {item_name}"
 
     if SHULKER_BOX_SIZE <= count < DOUBLE_CHEST_SIZE:
         shulker_box_count = count // SHULKER_BOX_SIZE
         remainder_stack_count = (count % SHULKER_BOX_SIZE) // STACK_SIZE
         remainder_count = (count % SHULKER_BOX_SIZE) % STACK_SIZE
         return f"{count} (" + \
-            f"{shulker_box_count} {add_s("shulker box", shulker_box_count, suffix="es")} + " + \
-            f"{remainder_stack_count} {add_s("stack", remainder_stack_count)} + " + \
+            f"{shulker_box_count}sb + " + \
+            f"{remainder_stack_count}s + " + \
             f"{remainder_count}" + \
             f") {item_name}"
 
@@ -49,10 +49,10 @@ def item_count_to_string(item_name: str, count: int) -> str:
     remainder_stack_count = (count % SHULKER_BOX_SIZE) // STACK_SIZE
     remainder_count = (count % SHULKER_BOX_SIZE) % STACK_SIZE
     return f"{count} (" + \
-        f"[{double_chest_count} {add_s("double chest", double_chest_count)} + " + \
-        f"{remainder_shulker_box_count} {add_s("shulker box", remainder_shulker_box_count, suffix="es")} / " + \
-        f"{shulker_box_count} {add_s("shulker box", shulker_box_count, suffix="es")}] + " + \
-        f"{remainder_stack_count} {add_s("stack", remainder_stack_count)} + " + \
+        f"[{double_chest_count}dc + " + \
+        f"{remainder_shulker_box_count}sb / " + \
+        f"{shulker_box_count}sb] + " + \
+        f"{remainder_stack_count}s + " + \
         f"{remainder_count}" + \
         f") {item_name}"
 
