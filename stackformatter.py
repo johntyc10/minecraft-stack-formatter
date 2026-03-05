@@ -7,8 +7,55 @@ except ImportError:
     print("[WARNING] Module pyperclip not found. Skipping copy.")
     pyperclip_imported = False
 
+def add_s(word: str, count: int, *, suffix: str = "s"):
+    """
+    Adds \"s\" (or custom suffix) if the count is non singular (!= 1).
+    """
+    return word + (suffix if count != 1 else "")
 
-STACK_SIZE = 64
+def item_count_to_string(item_name: str, count: int) -> str:
+    """
+    Takes item name and count as argument and returns a string that has human interpretable item count.
+    Eg. input: cobblestone, 149 -> output: 149 (2 stacks + 21) cobblestone
+    """
+    STACK_SIZE = 64
+    SHULKER_BOX_SIZE = 27 * 64
+    DOUBLE_CHEST_SIZE = 27 * 64 * 2
+
+    if count < 0:
+        raise ValueError("count cannot be less than 0!")
+    
+    if count <= STACK_SIZE:
+        return f"{count} {item_name}"
+
+    if STACK_SIZE <= count < SHULKER_BOX_SIZE:
+        stack_count = count // STACK_SIZE
+        remainder_count = count % STACK_SIZE
+        return f"{count} ({stack_count} {add_s("stack", stack_count)} + {remainder_count}) {item_name}"
+
+    if SHULKER_BOX_SIZE <= count < DOUBLE_CHEST_SIZE:
+        shulker_box_count = count // SHULKER_BOX_SIZE
+        remainder_stack_count = (count % SHULKER_BOX_SIZE) // STACK_SIZE
+        remainder_count = (count % SHULKER_BOX_SIZE) % STACK_SIZE
+        return f"{count} (" + \
+            f"{shulker_box_count} {add_s("shulker box", shulker_box_count, suffix="es")} + " + \
+            f"{remainder_stack_count} {add_s("stack", remainder_stack_count)} + " + \
+            f"{remainder_count}" + \
+            f") {item_name}"
+
+    double_chest_count = count // DOUBLE_CHEST_SIZE
+    remainder_shulker_box_count = (count % DOUBLE_CHEST_SIZE) // SHULKER_BOX_SIZE
+    shulker_box_count = count // SHULKER_BOX_SIZE
+    remainder_stack_count = (count % SHULKER_BOX_SIZE) // STACK_SIZE
+    remainder_count = (count % SHULKER_BOX_SIZE) % STACK_SIZE
+    return f"{count} (" + \
+        f"[{double_chest_count} {add_s("double chest", double_chest_count)} + " + \
+        f"{remainder_shulker_box_count} {add_s("shulker box", remainder_shulker_box_count, suffix="es")} / " + \
+        f"{shulker_box_count} {add_s("shulker box", shulker_box_count, suffix="es")}] + " + \
+        f"{remainder_stack_count} {add_s("stack", remainder_stack_count)} + " + \
+        f"{remainder_count}" + \
+        f") {item_name}"
+
 
 
 def prompt_yes_no(message: str, *, default_yes: bool = True):
@@ -82,10 +129,7 @@ def generate_material_list(material_list: dict) -> str:
     generated_material_list = []
     for item in material_list:
         item_count = material_list[item]
-        if item_count < STACK_SIZE:
-            generated_material_list.append(f"{item_count} {item}")
-        else:
-            generated_material_list.append(f"{item_count} ({item_count // STACK_SIZE}s + {item_count % STACK_SIZE}) {item}")
+        generated_material_list.append(item_count_to_string(item, item_count))
 
     return "\n".join(generated_material_list)
 
