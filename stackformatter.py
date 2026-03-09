@@ -71,63 +71,65 @@ def prompt_yes_no(message: str, *, default_yes: bool = True):
             return False
         print('Invalid input, please answer "yes" or "no".')
 
-def get_material_list() -> dict:
-    material_list = {}
 
-    while True:
-        item_name = input("Enter item name (press enter to stop inputting items): ").strip()
+class StackFormatter:
+    def __init__(self, list_input: dict[str, int] = {}) -> None:
+        self.material_list = list_input
 
-        if not item_name:
-            yes = prompt_yes_no("Are you sure you want to stop inputting items?")
+    def get_material_list(self) -> None:
+        while True:
+            item_name = input("Enter item name (press enter to stop inputting items): ").strip()
 
-            if yes:
-                break
-            else:
+            if not item_name:
+                yes = prompt_yes_no("Are you sure you want to stop inputting items?")
+
+                if yes:
+                    break
+                else:
+                    continue
+
+            if item_name in self.material_list:
+                yes = prompt_yes_no(f'"{item_name}" already exists.\n'
+                    'If you proceed, the previous count will be **overwritten**.\n'
+                    'Proceed and overwrite item count?', default_yes=False)
+
+                if not yes:
+                    continue
+
+            item_count = input("Enter item count: ")
+            try:
+                item_count = int(item_count)
+            except ValueError:
+                print("[ERROR] Please enter an integer.")
                 continue
 
-        if item_name in material_list:
-            yes = prompt_yes_no(f'"{item_name}" already exists.\n'
-                'If you proceed, the previous count will be **permanently overwritten**.\n'
-                'Proceed and overwrite item count?', default_yes=False)
-
-            if not yes:
+            if item_count <= 0:
+                print("Please enter a positive integer.")
                 continue
 
-        item_count = input("Enter item count: ")
-        try:
-            item_count = int(item_count)
-        except ValueError:
-            print("[ERROR] Please enter an integer.")
-            continue
+            self.material_list[item_name] = item_count
 
-        if item_count <= 0:
-            print("Please enter a positive integer.")
-            continue
+    def sort_by_count_desc(self) -> None:
+        self.material_list = dict(sorted(self.material_list.items(), key=lambda item: item[1], reverse=True))
 
-        material_list[item_name] = item_count
+    def generate_material_list(self) -> str:
+        """
+        Generate a material list with stacks calculated given a material list input.
+        Returns a string of the generated material list.
+        """
+        generated_material_list = []
+        for item in self.material_list:
+            item_count = self.material_list[item]
+            generated_material_list.append(item_count_to_string(item, item_count))
 
-    return material_list
-
-def sort_by_count_desc(material_list: dict[str, int]) -> dict:
-    return dict(sorted(material_list.items(), key=lambda item: item[1], reverse=True))
-
-def generate_material_list(material_list: dict) -> str:
-    """
-    Generate a material list with stacks calculated given a material list input.
-    Returns a string of the generated material list.
-    """
-    generated_material_list = []
-    for item in material_list:
-        item_count = material_list[item]
-        generated_material_list.append(item_count_to_string(item, item_count))
-
-    return "\n".join(generated_material_list)
+        return "\n".join(generated_material_list)
 
 
 if __name__ == "__main__":
-    material_list = get_material_list()
-    sorted_material_list = sort_by_count_desc(material_list)
-    generated_material_list = generate_material_list(sorted_material_list)
+    stackformatter = StackFormatter()
+    stackformatter.get_material_list()
+    stackformatter.sort_by_count_desc()
+    generated_material_list = stackformatter.generate_material_list()
 
     print("Generated material list:")
     print(generated_material_list)
