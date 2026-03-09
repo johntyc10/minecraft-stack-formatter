@@ -8,12 +8,6 @@ except ImportError:
     pyperclip_imported = False
 
 
-def add_s(word: str, count: int, *, suffix: str = "s"):
-    """
-    Adds \"s\" (or custom suffix) if the count is non singular (!= 1).
-    """
-    return word + (suffix if count != 1 else "")
-
 def item_count_to_string(item_name: str, count: int) -> str:
     """
     Takes item name (str) and (count): int as argument and returns human interpretable item count (string).
@@ -109,7 +103,7 @@ class StackFormatter:
 
             self.material_list[item_name] = item_count
 
-    def sort_by_count_desc(self) -> None:
+    def sort_material_list_by_count_desc(self) -> None:
         self.material_list = dict(sorted(self.material_list.items(), key=lambda item: item[1], reverse=True))
 
     def generate_material_list(self) -> str:
@@ -117,6 +111,9 @@ class StackFormatter:
         Generate a material list with stacks calculated given a material list input.
         Returns a string of the generated material list.
         """
+
+        self.sort_material_list_by_count_desc()
+
         generated_material_list = []
         for item in self.material_list:
             item_count = self.material_list[item]
@@ -128,7 +125,6 @@ class StackFormatter:
 if __name__ == "__main__":
     stackformatter = StackFormatter()
     stackformatter.get_material_list()
-    stackformatter.sort_by_count_desc()
     generated_material_list = stackformatter.generate_material_list()
 
     print("Generated material list:")
