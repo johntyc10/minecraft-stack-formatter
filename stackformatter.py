@@ -90,8 +90,8 @@ class StackFormatter:
 
             if item_name in self.material_list:
                 yes = prompt_yes_no(f'"{item_name}" already exists.\n'
-                    'If you proceed, the previous count will be **overwritten**.\n'
-                    'Proceed and overwrite item count?', default_yes=False)
+                    "If you proceed, the previous count will be **overwritten**.\n"
+                    "Proceed and overwrite item count?", default_yes=False)
 
                 if not yes:
                     continue
