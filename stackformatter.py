@@ -22,7 +22,6 @@ def item_count_to_string(item_name: str, count: int) -> str:
 
     STACK_SIZE = 64
     SHULKER_BOX_SIZE = 27 * STACK_SIZE
-    DOUBLE_CHEST_SIZE = 27 * STACK_SIZE * 2
 
     if count < 0:
         raise ValueError("count cannot be less than 0!")
@@ -30,8 +29,6 @@ def item_count_to_string(item_name: str, count: int) -> str:
     if count < STACK_SIZE:
         return f"{count} {item_name}"
 
-    double_chest_count = count // DOUBLE_CHEST_SIZE
-    remainder_shulker_box_count = (count % DOUBLE_CHEST_SIZE) // SHULKER_BOX_SIZE
     shulker_box_count = count // SHULKER_BOX_SIZE
     remainder_stack_count = (count % SHULKER_BOX_SIZE) // STACK_SIZE
     remainder_count = (count % SHULKER_BOX_SIZE) % STACK_SIZE
@@ -42,19 +39,13 @@ def item_count_to_string(item_name: str, count: int) -> str:
 
     quantity_list = []
 
-    if double_chest_count > 0:
-        quantity_list.append(
-            f"[{double_chest_count}dc" + \
-            (f" + {remainder_shulker_box_count}sb" if remainder_shulker_box_count > 0 else "") + \
-            f" / {shulker_box_count}sb]"
-        )
-    elif shulker_box_count > 0:
+    if shulker_box_count > 0:
         quantity_list.append(f"{shulker_box_count}sb")
-
     if remainder_stack_count > 0:
         quantity_list.append(f"{remainder_stack_count}s")
     if remainder_count > 0:
         quantity_list.append(f"{remainder_count}")
+
     return f"{count} ({" + ".join(quantity_list)}) {item_name}"
 
 def prompt_yes_no(message: str, *, default_yes: bool = True):
